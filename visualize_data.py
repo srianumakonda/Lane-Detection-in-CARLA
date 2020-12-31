@@ -6,8 +6,8 @@ def visualize_img(filepath, n_img):
   counter = 0
   images = []
   labels = []
-  img_path = os.path.join(filepath, "train")
-  label_path = os.path.join(filepath, "train_label")
+  img_path = os.path.join(filepath, "train/train")
+  label_path = os.path.join(filepath, "train_label/train_label")
   num_work =[]
 
   while counter < n_img:
