@@ -18,7 +18,7 @@ class UNet_Model:
     def __init__(self):
         self.model = None
 
-    def unet(self, pretrained_weights = None,input_size = (256,256,3)):
+    def unet(self, pretrained_weights = None,input_size = (256,256,1)):
         inputs = Input(input_size)
         conv1 = Conv2D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(inputs)
         conv1 = Conv2D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv1)
@@ -57,11 +57,12 @@ class UNet_Model:
         merge9 = concatenate([conv1,up9], axis = 3)
         conv9 = Conv2D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(merge9)
         conv9 = Conv2D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv9)
-        conv9 = Conv2D(3, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv9)
+        conv9 = Conv2D(2, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv9)
+        conv10 = Conv2D(1, 1, activation = 'sigmoid')(conv9)
 
-        self.model = Model(inputs = inputs, outputs = conv9)
+        self.model = Model(inputs = inputs, outputs = conv10)
 
-        self.model.compile(optimizer = "adam", loss = 'binary_crossentropy', metrics = ['accuracy'])
+        self.model.compile(optimizer = Adam(lr = 1e-4), loss = 'binary_crossentropy', metrics = ['accuracy'])
 
         if(pretrained_weights):
             self.model.load_weights(pretrained_weights)
@@ -74,17 +75,15 @@ class UNet_Model:
     def train_model(self, filepath, X_train, y_train, X_val, y_val, batch_size, epochs):
         train_gen = zip(X_train, y_train)
         valid_gen = zip(X_val, y_val)
-        reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2,
-                              patience=5, min_lr=0.001)
         callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3)
         model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(filepath=filepath,
                                                                        save_weights_only=True,
                                                                        monitor='val_accuracy',
                                                                        mode='max',
                                                                        save_best_only=True)
-        self.model.fit(train_gen, batch_size=batch_size, epochs=epochs, callbacks=[reduce_lr, callback, model_checkpoint_callback],
-                       validation_data=valid_gen, verbose=1) 
-
+        print(X_val.shape, y_val.shape)
+        self.model.fit(train_gen, batch_size=batch_size, steps_per_epoch=2922//32, epochs=epochs, callbacks=[callback, model_checkpoint_callback], verbose=1, validation_data=valid_gen)         
+    
     def predict_test_data(self, X_test):
         self.model.predict(X_test)
 
