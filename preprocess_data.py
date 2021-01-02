@@ -159,8 +159,8 @@ class SplitData(FixData):
         X_data_gen.fit(updated_X_train, augment=True, seed=42)
         y_data_gen.fit(updated_y_train, augment=True, seed=42)
 
-        X = X_data_gen.flow_from_directory(self.train_path, seed=42, class_mode=None, target_size=(256,256))
-        y = y_data_gen.flow_from_directory(self.train_label_path, seed=42, class_mode=None, target_size=(256,256))
+        X = X_data_gen.flow_from_directory(self.train_path, seed=42, class_mode=None, color_mode="grayscale", target_size=(256,256))
+        y = y_data_gen.flow_from_directory(self.train_label_path, seed=42, class_mode=None, color_mode="grayscale", target_size=(256,256))
         return X, y, updated_X_val, updated_y_val, updated_X_test, updated_y_test
 
         
