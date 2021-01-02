@@ -148,21 +148,22 @@ class SplitData(FixData):
         updated_X_test = np.array(self.X_test).reshape(129,256,256,1)
         updated_y_test = np.array(self.y_test).reshape(129,256,256,1)
 
-        clean_data = dict(featurewise_center=True,
-                          featurewise_std_normalization=True,
-                          rotation_range=90.,
-                          width_shift_range=0.1,
-                          height_shift_range=0.1,
-                          zoom_range=0.2,
-                          rescale=1./255)
-        X_data_gen = ImageDataGenerator(**clean_data)
-        y_data_gen = ImageDataGenerator(**clean_data)
-        X_data_gen.fit(updated_X_train, augment=True, seed=42)
-        y_data_gen.fit(updated_y_train, augment=True, seed=42)
+        # clean_data = dict(featurewise_center=True,
+        #                   featurewise_std_normalization=True,
+        #                   rotation_range=90.,
+        #                   width_shift_range=0.1,
+        #                   height_shift_range=0.1,
+        #                   zoom_range=0.2,
+        #                   rescale=1./255)
+        # X_data_gen = ImageDataGenerator(**clean_data)
+        # y_data_gen = ImageDataGenerator(**clean_data)
+        # X_data_gen.fit(updated_X_train, augment=True, seed=42)
+        # y_data_gen.fit(updated_y_train, augment=True, seed=42)
 
-        X = X_data_gen.flow_from_directory(self.train_path, seed=42, class_mode=None, color_mode="grayscale", target_size=(256,256))
-        y = y_data_gen.flow_from_directory(self.train_label_path, seed=42, class_mode=None, color_mode="grayscale", target_size=(256,256))
-        return X, y, updated_X_val, updated_y_val, updated_X_test, updated_y_test
+        # X = X_data_gen.flow_from_directory(self.train_path, seed=42, class_mode=None, color_mode="grayscale", target_size=(256,256))
+        # y = y_data_gen.flow_from_directory(self.train_label_path, seed=42, class_mode=None, color_mode="grayscale", target_size=(256,256))
+        # return X, y, updated_X_val, updated_y_val, updated_X_test, updated_y_test
+        return updated_X_train, updated_y_train, updated_X_val, updated_y_val, updated_X_test, updated_y_test
 
         
 
