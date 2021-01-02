@@ -18,7 +18,7 @@ class UNet_Model:
     def __init__(self):
         self.model = None
 
-    def unet(self, pretrained_weights = None,input_size = (256,256,1)):
+    def unet(self, pretrained_weights = None,input_size = (256,256,3)):
         inputs = Input(input_size)
         conv1 = Conv2D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(inputs)
         conv1 = Conv2D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv1)
@@ -72,7 +72,7 @@ class UNet_Model:
     def model_summary(self):
         return self.model.summary()
 
-    def train_model(self, filepath, X_train, y_train, X_val, y_val, batch_size, epochs):
+    def train_model(self, filepath, X_train, y_train, X_val, y_val, epochs):
         train_gen = zip(X_train, y_train)
         valid_gen = zip(X_val, y_val)
         callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3)
@@ -82,13 +82,6 @@ class UNet_Model:
                                                                        mode='max',
                                                                        save_best_only=True)
         print(X_val.shape, y_val.shape)
-        self.model.fit(train_gen, batch_size=batch_size, steps_per_epoch=2922//32, epochs=epochs, callbacks=[callback, model_checkpoint_callback], verbose=1, validation_data=valid_gen)         
-    
+        self.model.fit_generator(train_gen, steps_per_epoch=2922//32, epochs=epochs, callbacks=[callback, model_checkpoint_callback], verbose=1, validation_data=valid_gen)         
     def predict_test_data(self, X_test):
-        self.model.predict(X_test)
-
-    
-
-        
-
-        
+        self.model.predict(X_test)               
