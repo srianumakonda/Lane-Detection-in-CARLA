@@ -153,7 +153,8 @@ class SplitData(FixData):
                           rotation_range=90.,
                           width_shift_range=0.1,
                           height_shift_range=0.1,
-                          zoom_range=0.2)
+                          zoom_range=0.2,
+                          rescale=1./255)
         X_data_gen = ImageDataGenerator(**clean_data)
         y_data_gen = ImageDataGenerator(**clean_data)
         X_data_gen.fit(updated_X_train, augment=True, seed=42)
