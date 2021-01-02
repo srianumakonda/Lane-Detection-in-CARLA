@@ -81,7 +81,7 @@ class UNet_Model:
                                                                        monitor='val_accuracy',
                                                                        mode='max',
                                                                        save_best_only=True)
-        print(X_val.shape, y_val.shape)
-        self.model.fit_generator(train_gen, steps_per_epoch=2922//32, epochs=epochs, callbacks=[callback, model_checkpoint_callback], verbose=1, validation_data=valid_gen)         
+        # self.model.fit_generator(train_gen, steps_per_epoch=2922//32, epochs=epochs, callbacks=[callback, model_checkpoint_callback], verbose=1, validation_data=valid_gen)  
+        self.model.fit(train_gen, steps_per_epoch=2922//32, epochs=epochs, callbacks=[callback, model_checkpoint_callback], verbose=1, validation_data=valid_gen)           
     def predict_test_data(self, X_test):
         self.model.predict(X_test)               
