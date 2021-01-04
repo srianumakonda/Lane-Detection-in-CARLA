@@ -89,13 +89,24 @@ class UNet_Model:
         else:
             self.model.fit(x=X_train, y=y_train, validation_data=(X_val,y_val), steps_per_epoch=2922//32, epochs=epochs, callbacks=[callback, model_checkpoint_callback], verbose=1)           
 
-    def save_model(self, filepath, loaded_model):
+    def test_predict(self, loaded_model=False):
+        if loaded_model:
+            fig = plt.figure(figsize=(10,10))
+            plt.subplot(2, 2, 1)
+            plt.imshow(np.array(self.X_train[num]), cmap="gray")
+            plt.subplot(2, 2, 2)
+            plt.imshow(np.array(self.y_train[num]), cmap="gray")
+            plt.subplot(2, 2, 3)
+        else:
+
+
+    def save_model(self, filepath, loaded_model=False):
         if loaded_model:
             self.loaded_model.save(filepath, save_format='tf')
         else:
             self.model.save(filepath, save_format='tf')
 
-    def evaluate_model(self, X_test, y_test, loaded):
+    def evaluate_model(self, X_test, y_test, loaded=False):
         if loaded:
             self.loaded_model.evaluate(X_test, y_test, verbose=1)
         else:
