@@ -12,6 +12,7 @@ from keras.optimizers import *
 from keras.callbacks import ModelCheckpoint, LearningRateScheduler, ReduceLROnPlateau, EarlyStopping
 from keras import backend as keras
 import tensorflow as tf
+import matplotlib.pyplot as plt
 
 class UNet_Model:
 
@@ -89,25 +90,35 @@ class UNet_Model:
         else:
             self.model.fit(x=X_train, y=y_train, validation_data=(X_val,y_val), steps_per_epoch=2922//32, epochs=epochs, callbacks=[callback, model_checkpoint_callback], verbose=1)           
 
-    def test_predict(self, loaded_model=False):
-        if loaded_model:
+    def test_predict(self, X_test, y_test, idx, model_filepath=None):
+        if model_filepath is not None:
+            import_model = load_model(model_filepath)
             fig = plt.figure(figsize=(10,10))
             plt.subplot(2, 2, 1)
-            plt.imshow(np.array(self.X_train[num]), cmap="gray")
+            plt.imshow(np.array(X_test[idx]), cmap="gray")
             plt.subplot(2, 2, 2)
-            plt.imshow(np.array(self.y_train[num]), cmap="gray")
+            plt.imshow(np.squeeze(import_model.predict(np.array(X_test[idx]).reshape(1,256,256,1))), cmap="gray")
             plt.subplot(2, 2, 3)
+            plt.imshow(np.array(y_test[idx]), cmap="gray")
         else:
+            fig = plt.figure(figsize=(10,10))
+            plt.subplot(2, 2, 1)
+            plt.imshow(np.array(X_test[idx]), cmap="gray")
+            plt.subplot(2, 2, 2)
+            plt.imshow(np.squeeze(self.model.predict(np.array(X_test[idx]).reshape(1,256,256,1))), cmap="gray")
+            plt.subplot(2, 2, 3)
+            plt.imshow(np.array(y_test[idx]), cmap="gray")
 
-
-    def save_model(self, filepath, loaded_model=False):
+    def save_model(self, filepath=None, loaded_model=False):
         if loaded_model:
-            self.loaded_model.save(filepath, save_format='tf')
+            import_model = load_model(filepath)
+            import_model.save(filepath, save_format='tf')
         else:
             self.model.save(filepath, save_format='tf')
 
     def evaluate_model(self, X_test, y_test, loaded=False):
         if loaded:
-            self.loaded_model.evaluate(X_test, y_test, verbose=1)
+            import_model = load_model(filepath)
+            loaded_model.evaluate(X_test, y_test, verbose=1)
         else:
             self.model.evaluate(X_test, y_test, verbose=1)
