@@ -17,6 +17,7 @@ class UNet_Model:
 
     def __init__(self):
         self.model = None
+        self.loaded_model = None
 
     def unet(self, pretrained_weights = None,input_size = (256,256,1)):
         inputs = Input(input_size)
@@ -71,17 +72,31 @@ class UNet_Model:
 
     def model_summary(self):
         return self.model.summary()
+        
 
-    def train_model(self, filepath, X_train, y_train, X_val, y_val, epochs):
-        train_gen = zip(X_train, y_train)
-        valid_gen = zip(X_val, y_val)
+    def train_model(self, filepath, X_train, y_train, X_val, y_val, epochs, model_dir=None):
         callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3)
         model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(filepath=filepath,
-                                                                       save_weights_only=True,
-                                                                       monitor='val_accuracy',
-                                                                       mode='max',
-                                                                       save_best_only=True)
-        # self.model.fit_generator(train_gen, steps_per_epoch=2922//32, epochs=epochs, callbacks=[callback, model_checkpoint_callback], verbose=1, validation_data=valid_gen)  
-        self.model.fit(train_gen, steps_per_epoch=2922//32, epochs=epochs, callbacks=[callback, model_checkpoint_callback], verbose=1, validation_data=valid_gen)           
-    def predict_test_data(self, X_test):
-        self.model.predict(X_test)               
+                                                                        save_weights_only=True,
+                                                                        monitor='val_accuracy',
+                                                                        mode='max',
+                                                                        save_best_only=True)
+            
+        if model_dir is not None:
+            self.loaded_model = load_model(model_dir)
+            self.loaded_model.fit(x=X_train, y=y_train, validation_data=(X_val,y_val), steps_per_epoch=2922//32, epochs=epochs, callbacks=[callback, model_checkpoint_callback], verbose=1)      
+
+        else:
+            self.model.fit(x=X_train, y=y_train, validation_data=(X_val,y_val), steps_per_epoch=2922//32, epochs=epochs, callbacks=[callback, model_checkpoint_callback], verbose=1)           
+
+    def save_model(self, filepath, loaded_model):
+        if loaded_model:
+            self.loaded_model.save(filepath, save_format='tf')
+        else:
+            self.model.save(filepath, save_format='tf')
+
+    def evaluate_model(self, X_test, y_test, loaded):
+        if loaded:
+            self.loaded_model.evaluate(X_test, y_test, verbose=1)
+        else:
+            self.model.evaluate(X_test, y_test, verbose=1)
