@@ -20,7 +20,7 @@ class UNet_Model:
         self.model = None
         self.loaded_model = None
 
-    def unet(self, pretrained_weights = None,input_size = (256,256,1)):
+    def unet(self, pretrained_weights = None,input_size = (128,128,1)):
         inputs = Input(input_size)
         conv1 = Conv2D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(inputs)
         conv1 = Conv2D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv1)
@@ -97,7 +97,7 @@ class UNet_Model:
             plt.subplot(2, 2, 1)
             plt.imshow(np.array(X_test[idx]), cmap="gray")
             plt.subplot(2, 2, 2)
-            plt.imshow(np.squeeze(import_model.predict(np.array(X_test[idx]).reshape(1,256,256,1))), cmap="gray")
+            plt.imshow(np.squeeze(import_model.predict(np.array(X_test[idx]).reshape(1,128,128,1))), cmap="gray")
             plt.subplot(2, 2, 3)
             plt.imshow(np.array(y_test[idx]), cmap="gray")
         else:
@@ -105,20 +105,20 @@ class UNet_Model:
             plt.subplot(2, 2, 1)
             plt.imshow(np.array(X_test[idx]), cmap="gray")
             plt.subplot(2, 2, 2)
-            plt.imshow(np.squeeze(self.model.predict(np.array(X_test[idx]).reshape(1,256,256,1))), cmap="gray")
+            plt.imshow(np.squeeze(self.model.predict(np.array(X_test[idx]).reshape(1,128,128,1))), cmap="gray")
             plt.subplot(2, 2, 3)
             plt.imshow(np.array(y_test[idx]), cmap="gray")
 
-    def save_model(self, filepath=None, loaded_model=False):
-        if loaded_model:
-            import_model = load_model(filepath)
+    def save_model(self, filepath=None, imported_model=False):
+        if imported_model:
+            import_model = load_model(self.loaded_model)
             import_model.save(filepath, save_format='tf')
         else:
             self.model.save(filepath, save_format='tf')
 
-    def evaluate_model(self, X_test, y_test, loaded=False):
+    def evaluate_model(self, X_test, y_test, filepath=None, loaded=False):
         if loaded:
             import_model = load_model(filepath)
-            loaded_model.evaluate(X_test, y_test, verbose=1)
+            import_model.evaluate(X_test, y_test, verbose=1)
         else:
             self.model.evaluate(X_test, y_test, verbose=1)
