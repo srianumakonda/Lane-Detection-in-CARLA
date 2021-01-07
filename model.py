@@ -19,6 +19,13 @@ class UNet_Model:
     def __init__(self):
         self.model = None
         self.loaded_model = None
+        self.model_loaded = False
+
+    def load_model(self, filepath):
+        self.loaded_model = load_model(filepath=filepath)
+        self.model_loaded = True
+        return self.loaded_model
+
 
     def unet(self, pretrained_weights = None,input_size = (128,128,1)):
         inputs = Input(input_size)
@@ -75,7 +82,7 @@ class UNet_Model:
         return self.model.summary()
         
 
-    def train_model(self, filepath, X_train, y_train, X_val, y_val, epochs, model_dir=None):
+    def train_model(self, filepath, X_train, y_train, X_val, y_val, epochs):
         callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3)
         model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(filepath=filepath,
                                                                         save_weights_only=True,
@@ -83,21 +90,18 @@ class UNet_Model:
                                                                         mode='max',
                                                                         save_best_only=True)
             
-        if model_dir is not None:
-            self.loaded_model = load_model(model_dir)
+        if self.model_loaded:
             self.loaded_model.fit(x=X_train, y=y_train, validation_data=(X_val,y_val), steps_per_epoch=2922//32, epochs=epochs, callbacks=[callback, model_checkpoint_callback], verbose=1)      
-
         else:
             self.model.fit(x=X_train, y=y_train, validation_data=(X_val,y_val), steps_per_epoch=2922//32, epochs=epochs, callbacks=[callback, model_checkpoint_callback], verbose=1)           
 
     def test_predict(self, X_test, y_test, idx, model_filepath=None):
-        if model_filepath is not None:
-            import_model = load_model(model_filepath)
+        if self.model_loaded:
             fig = plt.figure(figsize=(10,10))
             plt.subplot(2, 2, 1)
             plt.imshow(np.array(X_test[idx]), cmap="gray")
             plt.subplot(2, 2, 2)
-            plt.imshow(np.squeeze(import_model.predict(np.array(X_test[idx]).reshape(1,128,128,1))), cmap="gray")
+            plt.imshow(np.squeeze(imported_model.predict(np.array(X_test[idx]).reshape(1,128,128,1))),cmap="gray")
             plt.subplot(2, 2, 3)
             plt.imshow(np.array(y_test[idx]), cmap="gray")
         else:
@@ -105,20 +109,18 @@ class UNet_Model:
             plt.subplot(2, 2, 1)
             plt.imshow(np.array(X_test[idx]), cmap="gray")
             plt.subplot(2, 2, 2)
-            plt.imshow(np.squeeze(self.model.predict(np.array(X_test[idx]).reshape(1,128,128,1))), cmap="gray")
+            plt.imshow(np.squeeze(imported_model.predict(np.array(X_test[idx]).reshape(1,128,128,1))),cmap="gray")
             plt.subplot(2, 2, 3)
             plt.imshow(np.array(y_test[idx]), cmap="gray")
 
-    def save_model(self, filepath=None, imported_model=False):
-        if imported_model:
-            import_model = load_model(self.loaded_model)
-            import_model.save(filepath, save_format='tf')
+    def save_model(self, file_dest):
+        if self.model_loaded:
+            self.loaded_model.save(file_dest, save_format='tf')
         else:
-            self.model.save(filepath, save_format='tf')
+            self.model.save(file_dest, save_format='tf')
 
     def evaluate_model(self, X_test, y_test, filepath=None, loaded=False):
-        if loaded:
-            import_model = load_model(filepath)
-            import_model.evaluate(X_test, y_test, verbose=1)
+        if self.model_loaded:
+            self.loaded_model.evaluate(X_test, y_test, verbose=1)
         else:
             self.model.evaluate(X_test, y_test, verbose=1)
