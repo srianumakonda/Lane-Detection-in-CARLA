@@ -91,9 +91,9 @@ class UNet_Model:
                                                                         save_best_only=True)
             
         if self.model_loaded:
-            self.loaded_model.fit(x=X_train, y=y_train, validation_data=(X_val,y_val), steps_per_epoch=2922//32, epochs=epochs, callbacks=[callback, model_checkpoint_callback], verbose=1)      
+            self.loaded_model.fit(x=X_train, y=y_train, validation_data=(X_val,y_val), steps_per_epoch=8766//32, epochs=epochs, callbacks=[callback, model_checkpoint_callback], verbose=1)      
         else:
-            self.model.fit(x=X_train, y=y_train, validation_data=(X_val,y_val), steps_per_epoch=2922//32, epochs=epochs, callbacks=[callback, model_checkpoint_callback], verbose=1)           
+            self.model.fit(x=X_train, y=y_train, validation_data=(X_val,y_val), steps_per_epoch=8766//32, epochs=epochs, callbacks=[callback, model_checkpoint_callback], verbose=1)           
 
     def test_predict(self, X_test, y_test, idx, model_filepath=None):
         if self.model_loaded:
@@ -101,7 +101,7 @@ class UNet_Model:
             plt.subplot(2, 2, 1)
             plt.imshow(np.array(X_test[idx]), cmap="gray")
             plt.subplot(2, 2, 2)
-            plt.imshow(np.squeeze(imported_model.predict(np.array(X_test[idx]).reshape(1,128,128,1))),cmap="gray")
+            plt.imshow(np.squeeze(self.loaded_model.predict(np.array(X_test[idx]).reshape(1,128,128,1))),cmap="gray")
             plt.subplot(2, 2, 3)
             plt.imshow(np.array(y_test[idx]), cmap="gray")
         else:
@@ -109,7 +109,7 @@ class UNet_Model:
             plt.subplot(2, 2, 1)
             plt.imshow(np.array(X_test[idx]), cmap="gray")
             plt.subplot(2, 2, 2)
-            plt.imshow(np.squeeze(imported_model.predict(np.array(X_test[idx]).reshape(1,128,128,1))),cmap="gray")
+            plt.imshow(np.squeeze(self.loaded_model.predict(np.array(X_test[idx]).reshape(1,128,128,1))),cmap="gray")
             plt.subplot(2, 2, 3)
             plt.imshow(np.array(y_test[idx]), cmap="gray")
 
