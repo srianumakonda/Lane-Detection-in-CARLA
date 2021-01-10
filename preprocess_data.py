@@ -103,32 +103,29 @@ class SplitData(FixData):
         for img in os.listdir(self.new_train_path):
             open_img = Image.open(os.path.join(self.new_train_path, img)).resize((img_size, img_size))
             open_img = ImageOps.grayscale(open_img)
-            open_img = open_img.filter(ImageFilter.FIND_EDGES)
+            open_img = open_img.filter(ImageFilter.FIND_EDGES).filter(ImageFilter.SHARPEN)
             self.X_train.append(np.array(open_img)/255.0)
-            flip_img = open_img.transpose(Image.FLIP_LEFT_RIGHT)
-            self.X_train.append(np.array(flip_img)/255.0)
-            rot_img = open_img.rotate(20)
-            self.X_train.append(np.array(rot_img)/255.0)
+            for i in range(5,25,5):
+                rot_img = open_img.rotate(i)
+                self.X_train.append(np.array(rot_img)/255.0)
 
         for img in os.listdir(self.val_path):
             open_img = Image.open(os.path.join(self.val_path, img)).resize((img_size, img_size))
             open_img = ImageOps.grayscale(open_img)
-            open_img = open_img.filter(ImageFilter.FIND_EDGES)
+            open_img = open_img.filter(ImageFilter.FIND_EDGES).filter(ImageFilter.SHARPEN)
             self.X_val.append(np.array(open_img)/255.0)
-            flip_img = open_img.transpose(Image.FLIP_LEFT_RIGHT)
-            self.X_val.append(np.array(flip_img)/255.0)
-            rot_img = open_img.rotate(20)
-            self.X_val.append(np.array(rot_img)/255.0)
+            for i in range(5,25,5):
+                rot_img = open_img.rotate(i)
+                self.X_val.append(np.array(rot_img)/255.0)
 
         for img in os.listdir(self.test_path):
             open_img = Image.open(os.path.join(self.test_path, img)).resize((img_size, img_size))
             open_img = ImageOps.grayscale(open_img)
-            open_img = open_img.filter(ImageFilter.FIND_EDGES)
+            open_img = open_img.filter(ImageFilter.FIND_EDGES).filter(ImageFilter.SHARPEN)
             self.X_test.append(np.array(open_img)/255.0)
-            flip_img = open_img.transpose(Image.FLIP_LEFT_RIGHT)
-            self.X_test.append(np.array(flip_img)/255.0)
-            rot_img = open_img.rotate(20)
-            self.X_test.append(np.array(rot_img)/255.0)
+            for i in range(5,25,5):
+                rot_img = open_img.rotate(i)
+                self.X_test.append(np.array(rot_img)/255.0)
 
         for img in os.listdir(self.new_train_label_path):
             open_img = Image.open(os.path.join(self.new_train_label_path, img)).resize((img_size, img_size))
@@ -137,10 +134,9 @@ class SplitData(FixData):
             open_img[open_img>0] = 1
             open_img = Image.fromarray(open_img)
             self.y_train.append(np.array(open_img)/255.0)
-            flip_img = open_img.transpose(Image.FLIP_LEFT_RIGHT)
-            self.y_train.append(np.array(flip_img)/255.0)
-            rot_img = open_img.rotate(20)
-            self.y_train.append(np.array(rot_img)/255.0)
+            for i in range(5,25,5):
+                rot_img = open_img.rotate(i)
+                self.y_train.append(np.array(rot_img)/255.0)
 
         for img in os.listdir(self.val_label_path):
             open_img = Image.open(os.path.join(self.val_label_path, img)).resize((img_size, img_size))
@@ -149,10 +145,9 @@ class SplitData(FixData):
             open_img[open_img>0] = 1
             open_img = Image.fromarray(open_img)
             self.y_val.append(np.array(open_img)/255.0)
-            flip_img = open_img.transpose(Image.FLIP_LEFT_RIGHT)
-            self.y_val.append(np.array(flip_img)/255.0)
-            rot_img = open_img.rotate(20)
-            self.y_val.append(np.array(rot_img)/255.0)
+            for i in range(5,25,5):
+                rot_img = open_img.rotate(i)
+                self.y_val.append(np.array(rot_img)/255.0)
 
         for img in os.listdir(self.test_label_path):
             open_img = Image.open(os.path.join(self.test_label_path, img)).resize((img_size, img_size))
@@ -161,10 +156,9 @@ class SplitData(FixData):
             open_img[open_img>0] = 1
             open_img = Image.fromarray(open_img)
             self.y_test.append(np.array(open_img)/255.0)
-            flip_img = open_img.transpose(Image.FLIP_LEFT_RIGHT)
-            self.y_test.append(np.array(flip_img)/255.0)
-            rot_img = open_img.rotate(20)
-            self.y_test.append(np.array(rot_img)/255.0)
+            for i in range(5,25,5):
+                rot_img = open_img.rotate(i)
+                self.y_test.append(np.array(rot_img)/255.0)
             
 
     def print_img_pair(self, num):
@@ -179,12 +173,12 @@ class SplitData(FixData):
 
     def data(self):
 
-        updated_X_train = np.array(self.X_train).reshape(8766,128,128,1)
-        updated_y_train = np.array(self.y_train).reshape(8766,128,128,1)
-        updated_X_val = np.array(self.X_val).reshape(459,128,128,1)
-        updated_y_val = np.array(self.y_val).reshape(459,128,128,1)
-        updated_X_test = np.array(self.X_test).reshape(387,128,128,1)
-        updated_y_test = np.array(self.y_test).reshape(387,128,128,1)
+        updated_X_train = np.array(self.X_train).reshape(14610,128,128,1)
+        updated_y_train = np.array(self.y_train).reshape(14610,128,128,1)
+        updated_X_val = np.array(self.X_val).reshape(765,128,128,1)
+        updated_y_val = np.array(self.y_val).reshape(765,128,128,1)
+        updated_X_test = np.array(self.X_test).reshape(645,128,128,1)
+        updated_y_test = np.array(self.y_test).reshape(645,128,128,1)
 
         return updated_X_train, updated_y_train, updated_X_val, updated_y_val, updated_X_test, updated_y_test
 
