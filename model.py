@@ -14,8 +14,8 @@ from keras import backend as keras
 from keras import backend as K
 import tensorflow as tf
 import matplotlib.pyplot as plt
-from tensorflow_addons.utils.keras_utils import LossFunctionWrapper
-from tensorflow_addons.utils.types import FloatTensorLike, TensorLike
+# from tensorflow_addons.utils.keras_utils import LossFunctionWrapper
+# from tensorflow_addons.utils.types import FloatTensorLike, TensorLike
 from typeguard import typechecked
 import tensorflow_addons as tfa
 
@@ -116,7 +116,8 @@ class UNet_Model:
         
         self.model = Model(inputs = inputs, outputs = conv10)
 
-        self.model.compile(optimizer=Adam(lr=1e-5), loss=tfa.losses.SigmoidFocalCrossEntropy(), metrics =['accuracy'])
+        # self.model.compile(optimizer=Adam(lr=1e-5), loss=tfa.losses.SigmoidFocalCrossEntropy(), metrics =['accuracy'])
+        self.model.compile(optimizer=Adam(lr=1e-5), loss="binary_crossentropy", metrics =['accuracy'])
 
         if(pretrained_weights):
             self.model.load_weights(pretrained_weights)
@@ -136,26 +137,26 @@ class UNet_Model:
                                                                         save_best_only=True)
             
         if self.model_loaded:
-            self.loaded_model.fit(x=X_train, y=y_train, validation_data=(X_val,y_val), steps_per_epoch=8766//32, epochs=epochs, callbacks=[callback, model_checkpoint_callback], verbose=1)      
+            self.loaded_model.fit(x=X_train, y=y_train, validation_data=(X_val,y_val), steps_per_epoch=14610//32, epochs=epochs, callbacks=[callback, model_checkpoint_callback], verbose=1)      
         else:
-            self.model.fit(x=X_train, y=y_train, validation_data=(X_val,y_val), steps_per_epoch=8766//32, epochs=epochs, callbacks=[callback, model_checkpoint_callback], verbose=1)           
+            self.model.fit(x=X_train, y=y_train, validation_data=(X_val,y_val), steps_per_epoch=14610//32, epochs=epochs, callbacks=[callback, model_checkpoint_callback], verbose=1)           
 
     def test_predict(self, X_test, y_test, idx, model_filepath=None):
         if self.model_loaded:
             fig = plt.figure(figsize=(10,10))
-            plt.subplot(2, 2, 1)
+            plt.subplot(3, 3, 1)
             plt.imshow(np.array(X_test[idx]), cmap="gray")
-            plt.subplot(2, 2, 2)
+            plt.subplot(3, 3, 2)
             plt.imshow(np.squeeze(self.loaded_model.predict(np.array(X_test[idx]).reshape(1,128,128,1))),cmap="gray")
-            plt.subplot(2, 2, 3)
+            plt.subplot(3, 3, 3)
             plt.imshow(np.array(y_test[idx]), cmap="gray")
         else:
             fig = plt.figure(figsize=(10,10))
-            plt.subplot(2, 2, 1)
+            plt.subplot(3, 3, 1)
             plt.imshow(np.array(X_test[idx]), cmap="gray")
-            plt.subplot(2, 2, 2)
+            plt.subplot(3, 3, 2)
             plt.imshow(np.squeeze(self.loaded_model.predict(np.array(X_test[idx]).reshape(1,128,128,1))),cmap="gray")
-            plt.subplot(2, 2, 3)
+            plt.subplot(3, 3, 3)
             plt.imshow(np.array(y_test[idx]), cmap="gray")
 
     def save_model(self, file_dest):
