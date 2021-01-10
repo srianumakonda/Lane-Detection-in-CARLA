@@ -1,6 +1,6 @@
 import os
 import shutil
-from PIL import Image, ImageOps
+from PIL import Image, ImageOps, ImageFilter
 from sklearn.model_selection import train_test_split
 import numpy as np
 import tensorflow as tf
@@ -103,6 +103,7 @@ class SplitData(FixData):
         for img in os.listdir(self.new_train_path):
             open_img = Image.open(os.path.join(self.new_train_path, img)).resize((img_size, img_size))
             open_img = ImageOps.grayscale(open_img)
+            open_img = open_img.filter(ImageFilter.FIND_EDGES)
             self.X_train.append(np.array(open_img)/255.0)
             flip_img = open_img.transpose(Image.FLIP_LEFT_RIGHT)
             self.X_train.append(np.array(flip_img)/255.0)
@@ -112,6 +113,7 @@ class SplitData(FixData):
         for img in os.listdir(self.val_path):
             open_img = Image.open(os.path.join(self.val_path, img)).resize((img_size, img_size))
             open_img = ImageOps.grayscale(open_img)
+            open_img = open_img.filter(ImageFilter.FIND_EDGES)
             self.X_val.append(np.array(open_img)/255.0)
             flip_img = open_img.transpose(Image.FLIP_LEFT_RIGHT)
             self.X_val.append(np.array(flip_img)/255.0)
@@ -121,6 +123,7 @@ class SplitData(FixData):
         for img in os.listdir(self.test_path):
             open_img = Image.open(os.path.join(self.test_path, img)).resize((img_size, img_size))
             open_img = ImageOps.grayscale(open_img)
+            open_img = open_img.filter(ImageFilter.FIND_EDGES)
             self.X_test.append(np.array(open_img)/255.0)
             flip_img = open_img.transpose(Image.FLIP_LEFT_RIGHT)
             self.X_test.append(np.array(flip_img)/255.0)
@@ -130,6 +133,9 @@ class SplitData(FixData):
         for img in os.listdir(self.new_train_label_path):
             open_img = Image.open(os.path.join(self.new_train_label_path, img)).resize((img_size, img_size))
             open_img = ImageOps.grayscale(open_img)
+            open_img = np.array(open_img)
+            open_img[open_img>0] = 1
+            open_img = Image.fromarray(open_img)
             self.y_train.append(np.array(open_img)/255.0)
             flip_img = open_img.transpose(Image.FLIP_LEFT_RIGHT)
             self.y_train.append(np.array(flip_img)/255.0)
@@ -139,6 +145,9 @@ class SplitData(FixData):
         for img in os.listdir(self.val_label_path):
             open_img = Image.open(os.path.join(self.val_label_path, img)).resize((img_size, img_size))
             open_img = ImageOps.grayscale(open_img)
+            open_img = np.array(open_img)
+            open_img[open_img>0] = 1
+            open_img = Image.fromarray(open_img)
             self.y_val.append(np.array(open_img)/255.0)
             flip_img = open_img.transpose(Image.FLIP_LEFT_RIGHT)
             self.y_val.append(np.array(flip_img)/255.0)
@@ -148,6 +157,9 @@ class SplitData(FixData):
         for img in os.listdir(self.test_label_path):
             open_img = Image.open(os.path.join(self.test_label_path, img)).resize((img_size, img_size))
             open_img = ImageOps.grayscale(open_img)
+            open_img = np.array(open_img)
+            open_img[open_img>0] = 1
+            open_img = Image.fromarray(open_img)
             self.y_test.append(np.array(open_img)/255.0)
             flip_img = open_img.transpose(Image.FLIP_LEFT_RIGHT)
             self.y_test.append(np.array(flip_img)/255.0)
