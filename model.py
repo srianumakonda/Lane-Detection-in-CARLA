@@ -11,8 +11,13 @@ from keras.layers import *
 from keras.optimizers import *
 from keras.callbacks import ModelCheckpoint, LearningRateScheduler, ReduceLROnPlateau, EarlyStopping
 from keras import backend as keras
+from keras import backend as K
 import tensorflow as tf
 import matplotlib.pyplot as plt
+from tensorflow_addons.utils.keras_utils import LossFunctionWrapper
+from tensorflow_addons.utils.types import FloatTensorLike, TensorLike
+from typeguard import typechecked
+import tensorflow_addons as tfa
 
 class UNet_Model:
 
@@ -25,6 +30,27 @@ class UNet_Model:
         self.loaded_model = load_model(filepath=filepath)
         self.model_loaded = True
         return self.loaded_model
+
+    # def binary_focal_loss(self, gamma=2.0, alpha=0.25):
+    #     def focal_loss(y_true, y_pred):
+    #         epsilon = K.epsilon()
+    #         y_pred = K.clip(y_pred, epsilon, 1.0-epsilon)
+    #         p_t = tf.where(K.equal(y_true, 1), y_pred, 1-y_pred)
+    #         alpha_factor = K.ones_like(y_true)*alpha
+    #         alpha_t = tf.where(K.equal(y_true, 1), alpha_factor, 1-alpha_factor)
+    #         cross_entropy = -K.log(p_t)
+    #         weight = alpha_t * K.pow((1-p_t), gamma)
+    #         loss = weight * cross_entropy
+    #         loss = K.sum(loss, axis=1)
+    #         return loss
+    #     return focal_loss    
+
+    # def focal_loss(self, gamma=2., alpha=.25):
+    #     def focal_loss_fixed(y_true, y_pred):
+    #         pt_1 = tf.where(tf.equal(y_true, 1), y_pred, tf.ones_like(y_pred))
+    #         pt_0 = tf.where(tf.equal(y_true, 0), y_pred, tf.zeros_like(y_pred))
+    #         return -K.mean(alpha * K.pow(1. - pt_1, gamma) * K.log(pt_1)) - K.mean((1 - alpha) * K.pow(pt_0, gamma) * K.log(1. - pt_0))
+    #     return focal_loss_fixed
 
 
     def unet(self, pretrained_weights = None,input_size = (128,128,1)):
@@ -87,11 +113,10 @@ class UNet_Model:
         conv9 = Conv2D(2, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv9)
         conv9 = BatchNormalization()(conv9)
         conv10 = Conv2D(1, 1, activation = 'sigmoid')(conv9)
-        conv10 = BatchNormalization()(conv10)
-
+        
         self.model = Model(inputs = inputs, outputs = conv10)
 
-        self.model.compile(optimizer = Adam(lr = 1e-4), loss = 'binary_crossentropy', metrics = ['accuracy'])
+        self.model.compile(optimizer=Adam(lr=1e-5), loss=tfa.losses.SigmoidFocalCrossEntropy(), metrics =['accuracy'])
 
         if(pretrained_weights):
             self.model.load_weights(pretrained_weights)
@@ -103,7 +128,7 @@ class UNet_Model:
         
 
     def train_model(self, filepath, X_train, y_train, X_val, y_val, epochs):
-        callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3)
+        callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=5)
         model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(filepath=filepath,
                                                                         save_weights_only=True,
                                                                         monitor='val_accuracy',
