@@ -53,7 +53,7 @@ class UNet_Model:
     #     return focal_loss_fixed
 
 
-    def unet(self, pretrained_weights = None,input_size = (128,128,1)):
+    def unet(self, input_size, loss, metrics):
         inputs = Input(input_size)
         conv1 = Conv2D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(inputs)
         conv1 = BatchNormalization()(conv1)
@@ -74,14 +74,14 @@ class UNet_Model:
         conv4 = BatchNormalization()(conv4)
         conv4 = Conv2D(512, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv4)
         conv4 = BatchNormalization()(conv4)
-        drop4 = Dropout(0.5)(conv4)
+        drop4 = Dropout(0.9)(conv4)
         pool4 = MaxPooling2D(pool_size=(2, 2))(drop4)
 
         conv5 = Conv2D(1024, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(pool4)
         conv5 = BatchNormalization()(conv5)
         conv5 = Conv2D(1024, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv5)
         conv5 = BatchNormalization()(conv5)
-        drop5 = Dropout(0.5)(conv5)
+        drop5 = Dropout(0.9)(conv5)
 
         up6 = Conv2D(512, 2, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(UpSampling2D(size = (2,2))(drop5))
         merge6 = concatenate([drop4,up6], axis = 3)
@@ -110,36 +110,31 @@ class UNet_Model:
         conv9 = BatchNormalization()(conv9)
         conv9 = Conv2D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv9)
         conv9 = BatchNormalization()(conv9)
-        conv9 = Conv2D(2, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv9)
+        conv9 = Conv2D(2, 3, activation = 'sigmoid', padding = 'same', kernel_initializer = 'he_normal')(conv9)
         conv9 = BatchNormalization()(conv9)
         conv10 = Conv2D(1, 1, activation = 'sigmoid')(conv9)
         
         self.model = Model(inputs = inputs, outputs = conv10)
 
         # self.model.compile(optimizer=Adam(lr=1e-5), loss=tfa.losses.SigmoidFocalCrossEntropy(), metrics =['accuracy'])
-        self.model.compile(optimizer=Adam(lr=1e-5), loss="binary_crossentropy", metrics =['accuracy'])
-
-        if(pretrained_weights):
-            self.model.load_weights(pretrained_weights)
-
+        self.model.compile(optimizer=Adam(lr=1e-2), loss=loss, metrics =[metrics])
         return self.model
 
     def model_summary(self):
         return self.model.summary()
         
-
-    def train_model(self, filepath, X_train, y_train, X_val, y_val, epochs):
+    def train_model(self, filepath, X_train, y_train, X_val, y_val, epochs, display_callback):
         callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=5)
         model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(filepath=filepath,
                                                                         save_weights_only=True,
-                                                                        monitor='val_accuracy',
+                                                                        monitor='val_dice',
                                                                         mode='max',
                                                                         save_best_only=True)
             
         if self.model_loaded:
-            self.loaded_model.fit(x=X_train, y=y_train, validation_data=(X_val,y_val), steps_per_epoch=14610//32, epochs=epochs, callbacks=[callback, model_checkpoint_callback], verbose=1)      
+            self.loaded_model.fit(x=X_train, y=y_train, validation_data=(X_val,y_val), steps_per_epoch=14610//32, epochs=epochs, callbacks=[callback, model_checkpoint_callback, display_callback], verbose=1)      
         else:
-            self.model.fit(x=X_train, y=y_train, validation_data=(X_val,y_val), steps_per_epoch=14610//32, epochs=epochs, callbacks=[callback, model_checkpoint_callback], verbose=1)           
+            self.model.fit(x=X_train, y=y_train, validation_data=(X_val,y_val), steps_per_epoch=14610//32, epochs=epochs, callbacks=[callback, model_checkpoint_callback, display_callback], verbose=1)           
 
     def test_predict(self, X_test, y_test, idx, model_filepath=None):
         if self.model_loaded:
@@ -147,7 +142,7 @@ class UNet_Model:
             plt.subplot(3, 3, 1)
             plt.imshow(np.array(X_test[idx]), cmap="gray")
             plt.subplot(3, 3, 2)
-            plt.imshow(np.squeeze(self.loaded_model.predict(np.array(X_test[idx]).reshape(1,128,128,1))),cmap="gray")
+            plt.imshow(np.squeeze(self.loaded_model.predict(np.array(X_test[idx]).reshape(1,128,128,3))),cmap="gray")
             plt.subplot(3, 3, 3)
             plt.imshow(np.array(y_test[idx]), cmap="gray")
         else:
@@ -155,7 +150,7 @@ class UNet_Model:
             plt.subplot(3, 3, 1)
             plt.imshow(np.array(X_test[idx]), cmap="gray")
             plt.subplot(3, 3, 2)
-            plt.imshow(np.squeeze(self.loaded_model.predict(np.array(X_test[idx]).reshape(1,128,128,1))),cmap="gray")
+            plt.imshow(np.squeeze(self.loaded_model.predict(np.array(X_test[idx]).reshape(1,128,128,3))),cmap="gray")
             plt.subplot(3, 3, 3)
             plt.imshow(np.array(y_test[idx]), cmap="gray")
 
