@@ -6,6 +6,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import matplotlib.pyplot as plt
+import cv2
 
 class FixData():
 
@@ -99,33 +100,38 @@ class SplitData(FixData):
         self.new_train_label_path = self.train_label_path + "/train_label"
 
     def resize_img(self, img_size):
-        print(self.val_path, self.val_label_path)
         for img in os.listdir(self.new_train_path):
             open_img = Image.open(os.path.join(self.new_train_path, img)).resize((img_size, img_size))
             open_img = ImageOps.grayscale(open_img)
-            open_img = open_img.filter(ImageFilter.FIND_EDGES).filter(ImageFilter.SHARPEN)
-            self.X_train.append(np.array(open_img)/255.0)
+            open_img = np.array(open_img)
+            open_img[open_img<200] = 0
+            open_img = Image.fromarray(open_img)
+            self.X_train.append(np.array(open_img)/np.max(open_img))
             for i in range(5,25,5):
                 rot_img = open_img.rotate(i)
-                self.X_train.append(np.array(rot_img)/255.0)
+                self.X_train.append(np.array(rot_img)/np.max(rot_img))
 
         for img in os.listdir(self.val_path):
             open_img = Image.open(os.path.join(self.val_path, img)).resize((img_size, img_size))
             open_img = ImageOps.grayscale(open_img)
-            open_img = open_img.filter(ImageFilter.FIND_EDGES).filter(ImageFilter.SHARPEN)
-            self.X_val.append(np.array(open_img)/255.0)
+            open_img = np.array(open_img)
+            open_img[open_img<200] = 0
+            open_img = Image.fromarray(open_img)
+            self.X_val.append(np.array(open_img)/np.max(open_img))
             for i in range(5,25,5):
                 rot_img = open_img.rotate(i)
-                self.X_val.append(np.array(rot_img)/255.0)
+                self.X_val.append(np.array(rot_img)/np.max(rot_img))
 
         for img in os.listdir(self.test_path):
             open_img = Image.open(os.path.join(self.test_path, img)).resize((img_size, img_size))
             open_img = ImageOps.grayscale(open_img)
-            open_img = open_img.filter(ImageFilter.FIND_EDGES).filter(ImageFilter.SHARPEN)
-            self.X_test.append(np.array(open_img)/255.0)
+            open_img = np.array(open_img)
+            open_img[open_img<200] = 0
+            open_img = Image.fromarray(open_img)
+            self.X_test.append(np.array(open_img)/np.max(open_img))
             for i in range(5,25,5):
                 rot_img = open_img.rotate(i)
-                self.X_test.append(np.array(rot_img)/255.0)
+                self.X_test.append(np.array(rot_img)/np.max(rot_img))
 
         for img in os.listdir(self.new_train_label_path):
             open_img = Image.open(os.path.join(self.new_train_label_path, img)).resize((img_size, img_size))
@@ -133,10 +139,10 @@ class SplitData(FixData):
             open_img = np.array(open_img)
             open_img[open_img>0] = 1
             open_img = Image.fromarray(open_img)
-            self.y_train.append(np.array(open_img)/255.0)
+            self.y_train.append(np.array(open_img))
             for i in range(5,25,5):
                 rot_img = open_img.rotate(i)
-                self.y_train.append(np.array(rot_img)/255.0)
+                self.y_train.append(np.array(rot_img))
 
         for img in os.listdir(self.val_label_path):
             open_img = Image.open(os.path.join(self.val_label_path, img)).resize((img_size, img_size))
@@ -144,10 +150,10 @@ class SplitData(FixData):
             open_img = np.array(open_img)
             open_img[open_img>0] = 1
             open_img = Image.fromarray(open_img)
-            self.y_val.append(np.array(open_img)/255.0)
+            self.y_val.append(np.array(open_img))
             for i in range(5,25,5):
                 rot_img = open_img.rotate(i)
-                self.y_val.append(np.array(rot_img)/255.0)
+                self.y_val.append(np.array(rot_img))
 
         for img in os.listdir(self.test_label_path):
             open_img = Image.open(os.path.join(self.test_label_path, img)).resize((img_size, img_size))
@@ -155,10 +161,10 @@ class SplitData(FixData):
             open_img = np.array(open_img)
             open_img[open_img>0] = 1
             open_img = Image.fromarray(open_img)
-            self.y_test.append(np.array(open_img)/255.0)
+            self.y_test.append(np.array(open_img))
             for i in range(5,25,5):
                 rot_img = open_img.rotate(i)
-                self.y_test.append(np.array(rot_img)/255.0)
+                self.y_test.append(np.array(rot_img))
             
 
     def print_img_pair(self, num):
@@ -172,15 +178,23 @@ class SplitData(FixData):
         return f"X_train: {np.array(self.X_train).shape}, X_val: {np.array(self.X_val).shape}, X_test: {np.array(self.X_test).shape}, y_train: {np.array(self.y_train).shape}, y_val: {np.array(self.y_val).shape}, y_test: {np.array(self.y_test).shape}"
 
     def data(self):
-
-        updated_X_train = np.array(self.X_train).reshape(14610,128,128,1)
-        updated_y_train = np.array(self.y_train).reshape(14610,128,128,1)
-        updated_X_val = np.array(self.X_val).reshape(765,128,128,1)
-        updated_y_val = np.array(self.y_val).reshape(765,128,128,1)
-        updated_X_test = np.array(self.X_test).reshape(645,128,128,1)
-        updated_y_test = np.array(self.y_test).reshape(645,128,128,1)
-
+        updated_X_train = np.array(self.X_train).reshape(14610,128,128,1).astype('float64')
+        updated_y_train = np.array(self.y_train).reshape(14610,128,128,1).astype('float64')
+        updated_X_val = np.array(self.X_val).reshape(765,128,128,1).astype('float64')
+        updated_y_val = np.array(self.y_val).reshape(765,128,128,1).astype('float64')
+        updated_X_test = np.array(self.X_test).reshape(645,128,128,1).astype('float64')
+        updated_y_test = np.array(self.y_test).reshape(645,128,128,1).astype('float64')
         return updated_X_train, updated_y_train, updated_X_val, updated_y_val, updated_X_test, updated_y_test
+'''
+        y_train_stacked = np.dstack((updated_y_train, cv2.bitwise_not(updated_y_train)))
+        y_val_stacked = np.dstack((updated_y_val, cv2.bitwise_not(updated_y_val)))
+        y_test_stacked = np.dstack((updated_y_test, cv2.bitwise_not(updated_y_test)))
+
+        y_train_stacked = y_train_stacked.reshape(14610,128,128,2)
+        y_val_stacked = y_val_stacked.reshape(765,128,128,2)
+        y_test_stacked = y_test_stacked.reshape(645,128,128,2)
+'''
+        
 
         
 
