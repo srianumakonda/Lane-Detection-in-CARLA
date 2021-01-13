@@ -99,41 +99,42 @@ class SplitData(FixData):
         self.new_train_path = self.train_path + "/train"
         self.new_train_label_path = self.train_label_path + "/train_label"
 
-    def resize_img(self, img_size):
-        for img in os.listdir(self.new_train_path):
+    def process_img(self, img, threshold_val, img_size, subset):
+        if subset == "train":
             open_img = Image.open(os.path.join(self.new_train_path, img)).resize((img_size, img_size))
             open_img = ImageOps.grayscale(open_img)
             open_img = np.array(open_img)
-            open_img[open_img<200] = 0
+            open_img[open_img<threshold_val] = 0
             open_img = Image.fromarray(open_img)
             self.X_train.append(np.array(open_img)/np.max(open_img))
             for i in range(5,25,5):
                 rot_img = open_img.rotate(i)
                 self.X_train.append(np.array(rot_img)/np.max(rot_img))
 
-        for img in os.listdir(self.val_path):
+        if subset == "val":
             open_img = Image.open(os.path.join(self.val_path, img)).resize((img_size, img_size))
             open_img = ImageOps.grayscale(open_img)
             open_img = np.array(open_img)
-            open_img[open_img<200] = 0
+            open_img[open_img<threshold_val] = 0
             open_img = Image.fromarray(open_img)
             self.X_val.append(np.array(open_img)/np.max(open_img))
             for i in range(5,25,5):
                 rot_img = open_img.rotate(i)
                 self.X_val.append(np.array(rot_img)/np.max(rot_img))
 
-        for img in os.listdir(self.test_path):
+        if subset == "test":
             open_img = Image.open(os.path.join(self.test_path, img)).resize((img_size, img_size))
             open_img = ImageOps.grayscale(open_img)
             open_img = np.array(open_img)
-            open_img[open_img<200] = 0
+            open_img[open_img<threshold_val] = 0
             open_img = Image.fromarray(open_img)
             self.X_test.append(np.array(open_img)/np.max(open_img))
             for i in range(5,25,5):
                 rot_img = open_img.rotate(i)
                 self.X_test.append(np.array(rot_img)/np.max(rot_img))
 
-        for img in os.listdir(self.new_train_label_path):
+    def process_mask(self, img, img_size, subset):
+        if subset == "train":
             open_img = Image.open(os.path.join(self.new_train_label_path, img)).resize((img_size, img_size))
             open_img = ImageOps.grayscale(open_img)
             open_img = np.array(open_img)
@@ -143,8 +144,7 @@ class SplitData(FixData):
             for i in range(5,25,5):
                 rot_img = open_img.rotate(i)
                 self.y_train.append(np.array(rot_img))
-
-        for img in os.listdir(self.val_label_path):
+        if subset == "val":
             open_img = Image.open(os.path.join(self.val_label_path, img)).resize((img_size, img_size))
             open_img = ImageOps.grayscale(open_img)
             open_img = np.array(open_img)
@@ -154,8 +154,7 @@ class SplitData(FixData):
             for i in range(5,25,5):
                 rot_img = open_img.rotate(i)
                 self.y_val.append(np.array(rot_img))
-
-        for img in os.listdir(self.test_label_path):
+        if subset == "test":
             open_img = Image.open(os.path.join(self.test_label_path, img)).resize((img_size, img_size))
             open_img = ImageOps.grayscale(open_img)
             open_img = np.array(open_img)
@@ -165,8 +164,26 @@ class SplitData(FixData):
             for i in range(5,25,5):
                 rot_img = open_img.rotate(i)
                 self.y_test.append(np.array(rot_img))
-            
 
+    def resize_img(self, img_size,threshold_val):
+        for img in os.listdir(self.new_train_path):
+            self.process_img(img,threshold_val,img_size,"train")
+
+        for img in os.listdir(self.val_path):
+            self.process_img(img,threshold_val,img_size,"val")
+        
+        for img in os.listdir(self.test_path):
+            self.process_img(img,threshold_val,img_size,"test")
+
+        for img in os.listdir(self.new_train_label_path):
+            self.process_mask(img,img_size,"train")
+
+        for img in os.listdir(self.val_label_path):
+            self.process_mask(img,img_size,"val")
+    
+        for img in os.listdir(self.test_label_path):
+            self.process_mask(img,img_size,"test")
+            
     def print_img_pair(self, num):
         fig = plt.figure(figsize=(10,10))
         plt.subplot(2, 2, 1)
@@ -185,17 +202,6 @@ class SplitData(FixData):
         updated_X_test = np.array(self.X_test).reshape(645,128,128,1).astype('float64')
         updated_y_test = np.array(self.y_test).reshape(645,128,128,1).astype('float64')
         return updated_X_train, updated_y_train, updated_X_val, updated_y_val, updated_X_test, updated_y_test
-'''
-        y_train_stacked = np.dstack((updated_y_train, cv2.bitwise_not(updated_y_train)))
-        y_val_stacked = np.dstack((updated_y_val, cv2.bitwise_not(updated_y_val)))
-        y_test_stacked = np.dstack((updated_y_test, cv2.bitwise_not(updated_y_test)))
-
-        y_train_stacked = y_train_stacked.reshape(14610,128,128,2)
-        y_val_stacked = y_val_stacked.reshape(765,128,128,2)
-        y_test_stacked = y_test_stacked.reshape(645,128,128,2)
-'''
-        
-
         
 
 
