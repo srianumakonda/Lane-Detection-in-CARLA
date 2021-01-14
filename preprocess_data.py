@@ -99,90 +99,121 @@ class SplitData(FixData):
         self.new_train_path = self.train_path + "/train"
         self.new_train_label_path = self.train_label_path + "/train_label"
 
-    def process_img(self, img, threshold_val, img_size, subset):
-        if subset == "train":
-            open_img = Image.open(os.path.join(self.new_train_path, img)).resize((img_size, img_size))
-            open_img = ImageOps.grayscale(open_img)
-            open_img = np.array(open_img)
-            open_img[open_img<threshold_val] = 0
-            open_img = Image.fromarray(open_img)
-            self.X_train.append(np.array(open_img)/np.max(open_img))
-            for i in range(5,25,5):
-                rot_img = open_img.rotate(i)
-                self.X_train.append(np.array(rot_img)/np.max(rot_img))
+    def process_img(self, img, threshold_val, img_size, subset, rot_range):
+        if rot_range % 5 is not 0:
+            raise ValueError("Number must be divisable by 5. Please input a number that is a multiple of 5")
+        else:
+            if subset == "train":
+                open_img = Image.open(os.path.join(self.new_train_path, img)).resize((img_size, img_size))
+                open_img = ImageOps.grayscale(open_img)
+                open_img = np.array(open_img)
+                open_img[open_img<threshold_val] = 0
+                open_img = Image.fromarray(open_img)
+                self.X_train.append(np.array(open_img)/np.max(open_img))
+                flip_img = ImageOps.flip(open_img)
+                self.X_train.append(np.array(flip_img)/np.max(flip_img))
+                mir_img = ImageOps.mirror(open_img)
+                self.X_train.append(np.array(mir_img)/np.max(mir_img))
+                for i in range(5,rot_range,5):
+                    rot_img = open_img.rotate(i)
+                    self.X_train.append(np.array(rot_img)/np.max(rot_img))
 
-        if subset == "val":
-            open_img = Image.open(os.path.join(self.val_path, img)).resize((img_size, img_size))
-            open_img = ImageOps.grayscale(open_img)
-            open_img = np.array(open_img)
-            open_img[open_img<threshold_val] = 0
-            open_img = Image.fromarray(open_img)
-            self.X_val.append(np.array(open_img)/np.max(open_img))
-            for i in range(5,25,5):
-                rot_img = open_img.rotate(i)
-                self.X_val.append(np.array(rot_img)/np.max(rot_img))
+            if subset == "val":
+                open_img = Image.open(os.path.join(self.val_path, img)).resize((img_size, img_size))
+                open_img = ImageOps.grayscale(open_img)
+                open_img = np.array(open_img)
+                open_img[open_img<threshold_val] = 0
+                open_img = Image.fromarray(open_img)
+                self.X_val.append(np.array(open_img)/np.max(open_img))
+                flip_img = ImageOps.flip(open_img)
+                self.X_val.append(np.array(flip_img)/np.max(flip_img))
+                mir_img = ImageOps.mirror(open_img)
+                self.X_val.append(np.array(mir_img)/np.max(mir_img))
+                for i in range(5,rot_range,5):
+                    rot_img = open_img.rotate(i)
+                    self.X_val.append(np.array(rot_img)/np.max(rot_img))
 
-        if subset == "test":
-            open_img = Image.open(os.path.join(self.test_path, img)).resize((img_size, img_size))
-            open_img = ImageOps.grayscale(open_img)
-            open_img = np.array(open_img)
-            open_img[open_img<threshold_val] = 0
-            open_img = Image.fromarray(open_img)
-            self.X_test.append(np.array(open_img)/np.max(open_img))
-            for i in range(5,25,5):
-                rot_img = open_img.rotate(i)
-                self.X_test.append(np.array(rot_img)/np.max(rot_img))
+            if subset == "test":
+                open_img = Image.open(os.path.join(self.test_path, img)).resize((img_size, img_size))
+                open_img = ImageOps.grayscale(open_img)
+                open_img = np.array(open_img)
+                open_img[open_img<threshold_val] = 0
+                open_img = Image.fromarray(open_img)
+                self.X_test.append(np.array(open_img)/np.max(open_img))
+                flip_img = ImageOps.flip(open_img)
+                self.X_test.append(np.array(flip_img)/np.max(flip_img))
+                mir_img = ImageOps.mirror(open_img)
+                self.X_test.append(np.array(mir_img)/np.max(mir_img))
+                for i in range(5,rot_range,5):
+                    rot_img = open_img.rotate(i)
+                    self.X_test.append(np.array(rot_img)/np.max(rot_img))
 
-    def process_mask(self, img, img_size, subset):
-        if subset == "train":
-            open_img = Image.open(os.path.join(self.new_train_label_path, img)).resize((img_size, img_size))
-            open_img = ImageOps.grayscale(open_img)
-            open_img = np.array(open_img)
-            open_img[open_img>0] = 1
-            open_img = Image.fromarray(open_img)
-            self.y_train.append(np.array(open_img))
-            for i in range(5,25,5):
-                rot_img = open_img.rotate(i)
-                self.y_train.append(np.array(rot_img))
-        if subset == "val":
-            open_img = Image.open(os.path.join(self.val_label_path, img)).resize((img_size, img_size))
-            open_img = ImageOps.grayscale(open_img)
-            open_img = np.array(open_img)
-            open_img[open_img>0] = 1
-            open_img = Image.fromarray(open_img)
-            self.y_val.append(np.array(open_img))
-            for i in range(5,25,5):
-                rot_img = open_img.rotate(i)
-                self.y_val.append(np.array(rot_img))
-        if subset == "test":
-            open_img = Image.open(os.path.join(self.test_label_path, img)).resize((img_size, img_size))
-            open_img = ImageOps.grayscale(open_img)
-            open_img = np.array(open_img)
-            open_img[open_img>0] = 1
-            open_img = Image.fromarray(open_img)
-            self.y_test.append(np.array(open_img))
-            for i in range(5,25,5):
-                rot_img = open_img.rotate(i)
-                self.y_test.append(np.array(rot_img))
+    def process_mask(self, img, img_size, subset, rot_range):
 
-    def resize_img(self, img_size,threshold_val):
+        if rot_range % 5 is not 0:
+            raise ValueError("Number must be divisable by 5. Please input a number that is a multiple of 5")
+        else:
+            if subset == "train":
+                open_img = Image.open(os.path.join(self.new_train_label_path, img)).resize((img_size, img_size))
+                open_img = ImageOps.grayscale(open_img)
+                open_img = np.array(open_img)
+                open_img[open_img>0] = 1
+                open_img = Image.fromarray(open_img)
+                self.y_train.append(np.array(open_img))
+                flip_img = ImageOps.flip(open_img)
+                self.y_train.append(np.array(flip_img))
+                mir_img = ImageOps.mirror(open_img)
+                self.y_train.append(np.array(mir_img))
+                for i in range(5,rot_range,5):
+                    rot_img = open_img.rotate(i)
+                    self.y_train.append(np.array(rot_img))
+            if subset == "val":
+                open_img = Image.open(os.path.join(self.val_label_path, img)).resize((img_size, img_size))
+                open_img = ImageOps.grayscale(open_img)
+                open_img = np.array(open_img)
+                open_img[open_img>0] = 1
+                open_img = Image.fromarray(open_img)
+                self.y_val.append(np.array(open_img))
+                flip_img = ImageOps.flip(open_img)
+                self.y_val.append(np.array(flip_img))
+                mir_img = ImageOps.mirror(open_img)
+                self.y_val.append(np.array(mir_img))
+                for i in range(5,rot_range,5):
+                    rot_img = open_img.rotate(i)
+                    self.y_val.append(np.array(rot_img))
+            if subset == "test":
+                open_img = Image.open(os.path.join(self.test_label_path, img)).resize((img_size, img_size))
+                open_img = ImageOps.grayscale(open_img)
+                open_img = np.array(open_img)
+                open_img[open_img>0] = 1
+                open_img = Image.fromarray(open_img)
+                self.y_test.append(np.array(open_img))
+                flip_img = ImageOps.flip(open_img)
+                self.y_test.append(np.array(flip_img))
+                mir_img = ImageOps.mirror(open_img)
+                self.y_test.append(np.array(mir_img))
+                for i in range(5,rot_range,5):
+                    rot_img = open_img.rotate(i)
+                    self.y_test.append(np.array(rot_img))
+
+    def resize_img(self, img_size, threshold_val, rot_range):
         for img in os.listdir(self.new_train_path):
-            self.process_img(img,threshold_val,img_size,"train")
+            self.process_img(img,threshold_val,img_size,"train",rot_range)
 
         for img in os.listdir(self.val_path):
-            self.process_img(img,threshold_val,img_size,"val")
+            self.process_img(img,threshold_val,img_size,"val",rot_range)
         
         for img in os.listdir(self.test_path):
-            self.process_img(img,threshold_val,img_size,"test")
+            self.process_img(img,threshold_val,img_size,"test",rot_range)
 
         for img in os.listdir(self.new_train_label_path):
-            self.process_mask(img,img_size,"train")
+            self.process_mask(img,img_size,"train",rot_range)
 
         for img in os.listdir(self.val_label_path):
-            self.process_mask(img,img_size,"val")
+            self.process_mask(img,img_size,"val",rot_range)
     
         for img in os.listdir(self.test_label_path):
-            self.process_mask(img,img_size,"test")
+            self.process_mask(img,img_size,"test",rot_range)
             
     def print_img_pair(self, num):
         fig = plt.figure(figsize=(10,10))
@@ -195,12 +226,12 @@ class SplitData(FixData):
         return f"X_train: {np.array(self.X_train).shape}, X_val: {np.array(self.X_val).shape}, X_test: {np.array(self.X_test).shape}, y_train: {np.array(self.y_train).shape}, y_val: {np.array(self.y_val).shape}, y_test: {np.array(self.y_test).shape}"
 
     def data(self):
-        updated_X_train = np.array(self.X_train).reshape(14610,128,128,1).astype('float64')
-        updated_y_train = np.array(self.y_train).reshape(14610,128,128,1).astype('float64')
-        updated_X_val = np.array(self.X_val).reshape(765,128,128,1).astype('float64')
-        updated_y_val = np.array(self.y_val).reshape(765,128,128,1).astype('float64')
-        updated_X_test = np.array(self.X_test).reshape(645,128,128,1).astype('float64')
-        updated_y_test = np.array(self.y_test).reshape(645,128,128,1).astype('float64')
+        updated_X_train = np.array(self.X_train).reshape(int(np.array(self.X_train).ravel().shape[0])//128//128,128,128,1).astype('float64')
+        updated_y_train = np.array(self.y_train).reshape(int(np.array(self.y_train).ravel().shape[0])//128//128,128,128,1).astype('float64')
+        updated_X_val = np.array(self.X_val).reshape(int(np.array(self.X_val).ravel().shape[0])//128//128,128,128,1).astype('float64')
+        updated_y_val = np.array(self.y_val).reshape(int(np.array(self.y_val).ravel().shape[0])//128//128,128,128,1).astype('float64')
+        updated_X_test = np.array(self.X_test).reshape(int(np.array(self.X_test).ravel().shape[0])//128//128,128,128,1).astype('float64')
+        updated_y_test = np.array(self.y_test).reshape(int(np.array(self.y_test).ravel().shape[0])//128//128,128,128,1).astype('float64')
         return updated_X_train, updated_y_train, updated_X_val, updated_y_val, updated_X_test, updated_y_test
         
 
