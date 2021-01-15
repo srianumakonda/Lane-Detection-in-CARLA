@@ -88,7 +88,7 @@ class UNet_Model:
         conv10 = Conv2D(1, 1, activation = 'sigmoid')(conv9)
         
         self.model = Model(inputs = inputs, outputs = conv10)
-        self.model.compile(optimizer=Adam(lr=1e-2), loss=loss, metrics =[metrics])
+        self.model.compile(optimizer=Adam(lr=1e-3), loss=loss, metrics =[metrics])
         return self.model
 
     def model_summary(self):
@@ -103,7 +103,7 @@ class UNet_Model:
         reducelr = ReduceLROnPlateau(monitor="val_loss",
                                      factor=0.2,
                                      patience=3,
-                                     min_lr=1e-5,
+                                     min_lr=1e-7,
                                      verbose=1)
                                                     
             
