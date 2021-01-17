@@ -1,7 +1,6 @@
 import os
 import shutil
 from PIL import Image, ImageOps, ImageFilter
-from sklearn.model_selection import train_test_split
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
@@ -29,32 +28,19 @@ class FixData():
             pass
         return self.filepath + "/test", self.filepath + "/test_label"
 
-    def move_folders(self):
-        os.makedirs(os.path.join(self.filepath, "train_2"))
-        os.makedirs(os.path.join(self.filepath, "train_label_2"))
-        shutil.move(self.train_path, os.path.join(self.filepath, "train_2"))
-        shutil.move(self.train_label_path, os.path.join(self.filepath, "train_label_2"))
-        os.rename(os.path.join(self.filepath, "train_label_2"), os.path.join(self.filepath, "train_label"))
-        os.rename(os.path.join(self.filepath, "train_2"), os.path.join(self.filepath, "train"))
-        self.new_names()        
-
     def add_zeros(self, num):
         return str(num.zfill(4))
-    
-    def new_names(self):
-        self.new_train_path = self.train_path + "/train"
-        self.new_train_label_path = self.train_label_path + "/train_label"
 
     def rename_sort_data(self):
-        for filename in os.listdir(self.new_train_path):
+        for filename in os.listdir(self.train_path):
             updated_filename = filename[44:]
-            updated_filename = os.path.join(self.new_train_path, self.add_zeros(updated_filename[:-4])+".png")
-            os.rename(os.path.join(self.new_train_path, filename), updated_filename)
+            updated_filename = os.path.join(self.train_path, self.add_zeros(updated_filename[:-4])+".png")
+            os.rename(os.path.join(self.train_path, filename), updated_filename)
 
-        for filename in os.listdir(self.new_train_label_path):
+        for filename in os.listdir(self.train_label_path):
             updated_filename = self.add_zeros(filename[44:-10])
-            updated_filename = os.path.join(self.new_train_label_path, updated_filename+".png")
-            os.rename(os.path.join(self.new_train_label_path, filename), updated_filename)
+            updated_filename = os.path.join(self.train_label_path, updated_filename+".png")
+            os.rename(os.path.join(self.train_label_path, filename), updated_filename)
 
         for filename in os.listdir(self.test_path):
             updated_filename = self.add_zeros(filename[44:-19])
@@ -67,17 +53,17 @@ class FixData():
             os.rename(os.path.join(self.test_label_path, filename), updated_filename)
 
     def create_val_set(self, pct):
-        if len(os.listdir(self.new_train_path)) == len(os.listdir(self.new_train_label_path)):
-            num_val_img = int(len(os.listdir(self.new_train_path))//(pct*100))
+        if len(os.listdir(self.train_path)) == len(os.listdir(self.train_label_path)):
+            num_val_img = int(len(os.listdir(self.train_path))//(pct*100))
             os.makedirs(os.path.join(self.filepath, "val"))
             os.makedirs(os.path.join(self.filepath, "val_label"))
             val_path = self.filepath + "/val"
             val_label_path = self.filepath + "/val_label"
-            for img in os.listdir(self.new_train_path)[-num_val_img:]:
-               shutil.move(os.path.join(self.new_train_path, img), val_path + "/" + img)
+            for img in os.listdir(self.train_path)[-num_val_img:]:
+               shutil.move(os.path.join(self.train_path, img), val_path + "/" + img)
 
-            for img in os.listdir(self.new_train_label_path)[-num_val_img:]:
-                shutil.move(os.path.join(self.new_train_label_path, img), val_label_path + "/" + img) 
+            for img in os.listdir(self.train_label_path)[-num_val_img:]:
+                shutil.move(os.path.join(self.train_label_path, img), val_label_path + "/" + img) 
 
             if len(os.listdir(val_path)) > 0 and len(os.listdir(val_label_path)) > 0:
                 print("Validation directories created.")
@@ -96,15 +82,13 @@ class SplitData(FixData):
 
         self.val_path = self.filepath + "/val"
         self.val_label_path = self.filepath + "/val_label"
-        self.new_train_path = self.train_path + "/train"
-        self.new_train_label_path = self.train_label_path + "/train_label"
 
     def process_img(self, img, threshold_val, img_size, subset, rot_range):
         if rot_range % 5 is not 0:
             raise ValueError("Number must be divisable by 5. Please input a number that is a multiple of 5")
         else:
             if subset == "train":
-                open_img = Image.open(os.path.join(self.new_train_path, img)).resize((img_size, img_size))
+                open_img = Image.open(os.path.join(self.train_path, img)).resize((img_size, img_size))
                 open_img = ImageOps.grayscale(open_img)
                 open_img = np.array(open_img)
                 open_img[open_img<threshold_val] = 0
@@ -154,7 +138,7 @@ class SplitData(FixData):
             raise ValueError("Number must be divisable by 5. Please input a number that is a multiple of 5")
         else:
             if subset == "train":
-                open_img = Image.open(os.path.join(self.new_train_label_path, img)).resize((img_size, img_size))
+                open_img = Image.open(os.path.join(self.train_label_path, img)).resize((img_size, img_size))
                 open_img = ImageOps.grayscale(open_img)
                 open_img = np.array(open_img)
                 open_img[open_img>0] = 1
@@ -197,7 +181,7 @@ class SplitData(FixData):
                     self.y_test.append(np.array(rot_img))
 
     def resize_img(self, img_size, threshold_val, rot_range):
-        for img in os.listdir(self.new_train_path):
+        for img in os.listdir(self.train_path):
             self.process_img(img,threshold_val,img_size,"train",rot_range)
 
         for img in os.listdir(self.val_path):
@@ -206,7 +190,7 @@ class SplitData(FixData):
         for img in os.listdir(self.test_path):
             self.process_img(img,threshold_val,img_size,"test",rot_range)
 
-        for img in os.listdir(self.new_train_label_path):
+        for img in os.listdir(self.train_label_path):
             self.process_mask(img,img_size,"train",rot_range)
 
         for img in os.listdir(self.val_label_path):
