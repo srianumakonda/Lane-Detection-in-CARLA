@@ -3,21 +3,14 @@ import tensorflow as tf
 import cv2
 import os
 import numpy as np
-from keras.models import *
-from keras import backend as K
+from tensorflow.keras import backend as K
 import matplotlib.pyplot as plt
-
-config = tf.compat.v1.ConfigProto(gpu_options = 
-                         tf.compat.v1.GPUOptions(per_process_gpu_memory_fraction=0.8)
-# device_count = {'GPU': 1}
-)
-config.gpu_options.allow_growth = True
-session = tf.compat.v1.Session(config=config)
-tf.compat.v1.keras.backend.set_session(session)
+import os
+# os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 if __name__ == "__main__":
 
-    loaded_model = load_model("final_model.tf",
+    loaded_model = tf.keras.models.load_model("final_model.h5",
                             custom_objects={'focal_tversky':loss.focal_tversky,'dice':loss.dice})
 
     img_list = []
@@ -34,4 +27,5 @@ if __name__ == "__main__":
     pred_list = np.asarray(pred_list)
 
     plt.imshow(pred_list[0])
+    plt.show()
 
