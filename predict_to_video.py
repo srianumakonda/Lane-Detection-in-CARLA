@@ -25,7 +25,7 @@ if __name__ == "__main__":
         pred_list.append(np.squeeze(loaded_model.predict(np.array(img).reshape(1,128,128,1))))
     img_list = np.asarray(img_list)
     pred_list = np.asarray(pred_list)
-
-    plt.imshow(pred_list[0])
+    plt.imshow(img_list[-1])
+    plt.imshow(pred_list[-1])
     plt.show()
 
