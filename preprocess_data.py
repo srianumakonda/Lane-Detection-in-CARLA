@@ -2,10 +2,7 @@ import os
 import shutil
 from PIL import Image, ImageOps, ImageFilter
 import numpy as np
-import tensorflow as tf
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import matplotlib.pyplot as plt
-import cv2
 
 class FixData():
 
@@ -82,6 +79,66 @@ class SplitData(FixData):
 
         self.val_path = self.filepath + "/val"
         self.val_label_path = self.filepath + "/val_label"
+
+    def non_aug_data(self,subset):
+
+        if subset == "X_train":
+            aug_list = []
+            for img in os.listdir(self.train_path):
+                open_img = Image.open(os.path.join(self.train_path, img)).resize((128, 128))
+                open_img = ImageOps.grayscale(open_img)
+                open_img = np.array(open_img)
+                aug_list.append(open_img)
+            return np.array(aug_list)
+
+        if subset == "X_val":
+            aug_list = []
+            for img in os.listdir(self.val_path):
+                open_img = Image.open(os.path.join(self.val_path, img)).resize((128, 128))
+                open_img = ImageOps.grayscale(open_img)
+                open_img = np.array(open_img)
+                aug_list.append(open_img)
+            return np.array(aug_list)
+
+        if subset == "X_test":
+            aug_list = []
+            for img in os.listdir(self.test_path):
+                open_img = Image.open(os.path.join(self.test_path, img)).resize((128, 128))
+                open_img = ImageOps.grayscale(open_img)
+                open_img = np.array(open_img)
+                aug_list.append(open_img)
+            return np.array(aug_list)
+
+        if subset == "y_train":
+            aug_list = []
+            for img in os.listdir(self.train_label_path):
+                open_img = Image.open(os.path.join(self.train_label_path, img)).resize((128, 128))
+                open_img = ImageOps.grayscale(open_img)
+                open_img = np.array(open_img)
+                open_img[open_img>0] = 1
+                aug_list.append(open_img)
+            return np.array(aug_list)
+
+        if subset == "y_val":
+            aug_list = []
+            for img in os.listdir(self.val_label_path):
+                open_img = Image.open(os.path.join(self.val_label_path, img)).resize((128, 128))
+                open_img = ImageOps.grayscale(open_img)
+                open_img = np.array(open_img)
+                open_img[open_img>0] = 1
+                aug_list.append(open_img)
+            return np.array(aug_list)
+
+        if subset == "y_test":
+            aug_list = []
+            for img in os.listdir(self.test_label_path):
+                open_img = Image.open(os.path.join(self.test_label_path, img)).resize((128, 128))
+                open_img = ImageOps.grayscale(open_img)
+                open_img = np.array(open_img)
+                open_img[open_img>0] = 1
+                aug_list.append(open_img)
+            return np.array(aug_list)
+
 
     def process_img(self, img, threshold_val, img_size, subset, rot_range):
         if rot_range % 5 is not 0:
@@ -217,7 +274,3 @@ class SplitData(FixData):
         updated_X_test = np.array(self.X_test).reshape(int(np.array(self.X_test).ravel().shape[0])//128//128,128,128,1).astype('float64')
         updated_y_test = np.array(self.y_test).reshape(int(np.array(self.y_test).ravel().shape[0])//128//128,128,128,1).astype('float64')
         return updated_X_train, updated_y_train, updated_X_val, updated_y_val, updated_X_test, updated_y_test
-        
-
-
-    
