@@ -23,7 +23,7 @@ if __name__ == "__main__":
 
     visualize_img(filepath, 2)
     fig = plt.figure(figsize = (20, 10)) 
-    plt.bar(["Train", "Test"], [len(os.listdir(os.path.join(filepath, "train/train"))), len(os.listdir(os.path.join(filepath, "test")))],
+    plt.bar(["Train", "Test"], [len(os.listdir(os.path.join(filepath, "train"))), len(os.listdir(os.path.join(filepath, "test")))],
             color="maroon")
     matplotlib.rc('xtick', labelsize=20) 
     matplotlib.rc('ytick', labelsize=20) 
