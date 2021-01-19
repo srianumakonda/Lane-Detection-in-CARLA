@@ -19,9 +19,9 @@ After doing this, I got around 23376 images to work with. I kept the image size 
 
 I also performed a validation split (of around 0.2). I did not want to play around with this value since it had worked for me and I didn't think it was worth the time to actually play around with this.
 
-Resulting shapes: X_train: (23376, 128, 128, 1), X_val: (1224, 128, 128, 1), X_test: (1032, 128, 128, 1), y_train: (23376, 128, 128, 1), y_val: (1224, 128, 128, 1), y_test: (1032, 128, 128, 1)
+These are the shapes of my following data before importing them into the model: X_train: (23376, 128, 128, 1), X_val: (1224, 128, 128, 1), X_test: (1032, 128, 128, 1), y_train: (23376, 128, 128, 1), y_val: (1224, 128, 128, 1), y_test: (1032, 128, 128, 1)
 
-
+Note: I already have preprocessed the data which you can find in dataset.zip. Download that, and you can directly import it onto your model if you'd like to.
 
 ## Algorithm
 
