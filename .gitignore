@@ -1,3 +1,5 @@
 carla-dataset/
 predictions/
 dataset/
+.vscode/
+__pycache__/
