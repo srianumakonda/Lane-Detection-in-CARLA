@@ -39,13 +39,13 @@ Here is the result after training the model for around 20 epochs:
 
 ## Setup
 <strong>Libraries</strong>
-Python version: 3.8.5
-Tensorflow == 2.4.0
-Keras == 2.3.0
-PIL == 8.1.0
-cv2 == 4.5.1
-matplotlib == 3.3.3
-numpy == 1.19.5
+- Python version: 3.8.5
+- Tensorflow == 2.4.0
+- Keras == 2.3.0
+- PIL == 8.1.0
+- cv2 == 4.5.1
+- matplotlib == 3.3.3
+- numpy == 1.19.5
 
 After installing the dataset, simply run main.py. That is all you'll have to do to replicate this process.
 
