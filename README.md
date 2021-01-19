@@ -60,10 +60,11 @@ After installing the dataset, simply run main.py. That is all you'll have to do 
 }
 ```
 Loss functions: https://github.com/nabsabraham/focal-tversky-unet/blob/master/losses.py
+
 U-Net architecture code: https://github.com/zhixuhao/unet/blob/master/model.py
 
 ## Future Plans
 
 I am currently doing the udacity nanodegrees on self driving cars. If you know anyone in the autonomous vehicle space, please do send me an email at info@srianumakonda.com . I'd really appreciate and love to have a chat with anyone who's working in the autonomous vehicle space :)
 
-![Contact information](https://github.com/srianumakonda/srianumakonda/blob/main/README.md)
+<a href="https://github.com/srianumakonda/srianumakonda/blob/main/README.md">Contact information</a>
