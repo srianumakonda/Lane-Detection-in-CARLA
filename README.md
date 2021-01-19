@@ -29,14 +29,25 @@ I used the U-Net model which is a model that was made for biomedical image segme
 
 ![U-net architecture](https://lmb.informatik.uni-freiburg.de/people/ronneber/u-net/u-net-architecture.png)
 
-The model follow's an encoder-decoder type network where it applies convolutions, maxpooling, and dropout layers. After that, it uses Upsampling to upsample the image and return the output image of the dataset. 
+The model follow's an encoder-decoder type network where it applies convolutions, maxpooling, and dropout layers. After that, it uses Upsampling to upsample the image and return the output image of the dataset. The code of the neural network architecture was taken from https://github.com/zhixuhao/unet/blob/master/model.py. Credit goes to the user for posting it. 
 
 I also used the focal tversky loss functions and the dice coefficients. I did not create the loss functions. Credit to the loss functions go to https://github.com/nabsabraham/focal-tversky-unet/blob/master/losses.py for providing the loss functions. Their research proposed a "generalized focal loss function based on the tversky index to address the issue of data imbalance in medical image segmentation."
 
-## Setup
+Here is the result after training the model for around 20 epochs:
 
+<img src="output_video.gif" alt="Your image title" width="500%"/>
+
+## Setup
+<strong>Libraries</strong>
+Python version: 3.8.5
 Tensorflow == 2.4.0
-Keras 
+Keras == 2.3.0
+PIL == 8.1.0
+cv2 == 4.5.1
+matplotlib == 3.3.3
+numpy == 1.19.5
+
+After installing the dataset, simply run main.py. That is all you'll have to do to replicate this process.
 
 ## Credits
 
@@ -48,12 +59,11 @@ Keras
   year={2018}
 }
 ```
+Loss functions: https://github.com/nabsabraham/focal-tversky-unet/blob/master/losses.py
+U-Net architecture code: https://github.com/zhixuhao/unet/blob/master/model.py
 
 ## Future Plans
 
-Result:
+I am currently doing the udacity nanodegrees on self driving cars. If you know anyone in the autonomous vehicle space, please do send me an email at info@srianumakonda.com . I'd really appreciate and love to have a chat with anyone who's working in the autonomous vehicle space :)
 
-<img src="output_video.gif" alt="Your image title" width="500%"/>
-
-
-tetet
+![Contact information](https://github.com/srianumakonda/srianumakonda/blob/main/README.md)
