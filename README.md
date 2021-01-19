@@ -31,6 +31,8 @@ I used the U-Net model which is a model that was made for biomedical image segme
 
 The model follow's an encoder-decoder type network where it applies convolutions, maxpooling, and dropout layers. After that, it uses Upsampling to upsample the image and return the output image of the dataset. 
 
+I also used the focal tversky loss functions and the dice coefficients. I did not create the loss functions. Credit to the loss functions go to https://github.com/nabsabraham/focal-tversky-unet/blob/master/losses.py for providing the loss functions. Their research proposed a "generalized focal loss function based on the tversky index to address the issue of data imbalance in medical image segmentation."
+
 ## Setup
 
 Tensorflow == 2.4.0
@@ -38,12 +40,14 @@ Keras
 
 ## Credits
 
+```
 @article{focal-unet,
   title={A novel Focal Tversky loss function with improved Attention U-Net for lesion segmentation},
   author={Abraham, Nabila and Khan, Naimul Mefraz},
   journal={arXiv preprint arXiv:1810.07842},
   year={2018}
 }
+```
 
 ## Future Plans
 
