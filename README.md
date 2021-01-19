@@ -29,12 +29,21 @@ I used the U-Net model which is a model that was made for biomedical image segme
 
 ![U-net architecture](https://lmb.informatik.uni-freiburg.de/people/ronneber/u-net/u-net-architecture.png)
 
+The model follow's an encoder-decoder type network where it applies convolutions, maxpooling, and dropout layers. After that, it uses Upsampling to upsample the image and return the output image of the dataset. 
+
 ## Setup
 
 Tensorflow == 2.4.0
 Keras 
 
 ## Credits
+
+@article{focal-unet,
+  title={A novel Focal Tversky loss function with improved Attention U-Net for lesion segmentation},
+  author={Abraham, Nabila and Khan, Naimul Mefraz},
+  journal={arXiv preprint arXiv:1810.07842},
+  year={2018}
+}
 
 ## Future Plans
 
