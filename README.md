@@ -52,7 +52,8 @@ Keras
 ## Future Plans
 
 Result:
-![alt text](output_video.gif)
+
+<img src="output_video.gif" alt="Your image title" width="250"/>
 
 
 tetet
