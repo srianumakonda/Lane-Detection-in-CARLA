@@ -53,7 +53,7 @@ Keras
 
 Result:
 
-<img src="output_video.gif" alt="Your image title" width="250"/>
+<img src="output_video.gif" alt="Your image title" width="500%"/>
 
 
 tetet
