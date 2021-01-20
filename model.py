@@ -11,7 +11,6 @@ from keras import backend as keras
 from keras import backend as K
 import tensorflow as tf
 import matplotlib.pyplot as plt
-from typeguard import typechecked
 import tensorflow_addons as tfa
 
 class UNet_Model:
@@ -135,9 +134,3 @@ class UNet_Model:
             self.loaded_model.save(file_dest, save_format='tf')
         else:
             self.model.save(file_dest, save_format='tf')
-
-    def evaluate_model(self, X_test, y_test, filepath=None, loaded=False):
-        if self.model_loaded:
-            self.loaded_model.evaluate(X_test, y_test, verbose=1)
-        else:
-            self.model.evaluate(X_test, y_test, verbose=1)
