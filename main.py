@@ -68,3 +68,4 @@ if __name__ == "__main__":
                     X_val=X_val, y_val=y_val, epochs=20, display_callback=DisplayCallback())
 
     train_model.evaluate(X_test,y_test)
+    model.save_model("path_to_dest.tf")
