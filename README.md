@@ -25,7 +25,7 @@ Note: I already have preprocessed the data which you can find in dataset.zip. Do
 
 ## Algorithm
 
-I used the U-Net model which is a model that was made for biomedical image segmentation by teh University of Freiburg.
+I used the U-Net model which is a model that was made for biomedical image segmentation by the University of Freiburg.
 
 ![U-net architecture](https://lmb.informatik.uni-freiburg.de/people/ronneber/u-net/u-net-architecture.png)
 
