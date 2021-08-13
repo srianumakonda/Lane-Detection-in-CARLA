@@ -51,14 +51,6 @@ After installing the dataset, simply run main.py. That is all you'll have to do 
 
 ## Credits
 
-```
-@article{focal-unet,
-  title={A novel Focal Tversky loss function with improved Attention U-Net for lesion segmentation},
-  author={Abraham, Nabila and Khan, Naimul Mefraz},
-  journal={arXiv preprint arXiv:1810.07842},
-  year={2018}
-}
-```
 Loss functions: https://github.com/nabsabraham/focal-tversky-unet/blob/master/losses.py
 
 U-Net architecture code: https://github.com/zhixuhao/unet/blob/master/model.py
